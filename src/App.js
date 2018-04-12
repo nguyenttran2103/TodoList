@@ -9,7 +9,11 @@ class App extends Component {
     this.state = {
       tasks: [],
       displayForm: false,
-      edittingTask: null
+      edittingTask: null,
+      filter: {
+        name: "",
+        status: -1
+      }
     };
   }
 
@@ -72,6 +76,15 @@ class App extends Component {
     this.onCloseForm();
   }
 
+  onFilter = (filterName, filterStatus) => {
+    this.setState({
+      filter: {
+        name: filterName.toLowerCase(),
+        status: parseInt(filterStatus, 10)
+      }
+    });
+  }
+
   onChangeStatus = (itemId) => {
     const { tasks } = this.state;
     let foundItem = tasks.find(item => item.id === itemId);
@@ -107,7 +120,19 @@ class App extends Component {
   }
 
   render() {
-    const { tasks, displayForm } = this.state;
+    let { tasks, displayForm, filter } = this.state;
+    
+    tasks = tasks.filter(task => task.name.toLowerCase().indexOf(filter.name) !== -1);
+    tasks = tasks.filter(task => {
+      if (filter.status === 0) {
+        return task.status === true;
+      }
+      else if (filter.status === 1) {
+        return task.status === false;
+      }
+      return task;
+    });
+
     let taskFormElement = displayForm ? <TaskForm onCloseForm={this.onCloseForm}
       onSubmit={this.onSubmit}
       task={this.state.edittingTask} /> : ''
@@ -129,7 +154,11 @@ class App extends Component {
             {/* Toolbar */}
             <Toolbar />
             {/* TaskList */}
-            <TaskList tasks={tasks} onChangeStatus={this.onChangeStatus} onDelete={this.onDelete} onEdit={this.onEdit} />
+            <TaskList tasks={tasks} 
+              onChangeStatus={this.onChangeStatus} 
+              onDelete={this.onDelete} 
+              onEdit={this.onEdit}
+              onFilter={this.onFilter} />
           </div>
         </div>
       </div>
