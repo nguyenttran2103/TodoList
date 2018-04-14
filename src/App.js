@@ -13,6 +13,11 @@ class App extends Component {
       filter: {
         name: "",
         status: -1
+      },
+      keyword: "",
+      sort: {
+        by: "",
+        direction: -1
       }
     };
   }
@@ -76,6 +81,12 @@ class App extends Component {
     this.onCloseForm();
   }
 
+  onSearch = (keyword) => {
+    this.setState({
+      keyword: keyword.toLowerCase()
+    });
+  }
+
   onFilter = (filterName, filterStatus) => {
     this.setState({
       filter: {
@@ -119,9 +130,21 @@ class App extends Component {
     });
   }
 
-  render() {
-    let { tasks, displayForm, filter } = this.state;
-    
+  onSort = (sort) => {    
+    console.log(sort)
+    this.setState({
+      sort: {
+        by: sort.by,
+        direction: sort.direction
+      }
+    });
+  }
+
+  
+
+  render() {    
+    let { tasks, displayForm, filter, keyword, sort } = this.state;
+
     tasks = tasks.filter(task => task.name.toLowerCase().indexOf(filter.name) !== -1);
     tasks = tasks.filter(task => {
       if (filter.status === 0) {
@@ -132,6 +155,21 @@ class App extends Component {
       }
       return task;
     });
+    tasks = tasks.filter(task => task.name.toLowerCase().indexOf(keyword) !== -1);
+
+    if (sort.by === "name") {
+      tasks = tasks.sort((a, b) => {
+        if (a.name > b.name) return sort.direction;
+        else if (a.name < b.name) return -sort.direction;
+        else return 0;
+      });
+    } else if (sort.by === "status") {
+      tasks = tasks.sort((a, b) => {
+        if (a.status > b.status) return -sort.direction;
+        else if (a.status < b.status) return sort.direction;
+        else return 0;
+      });
+    }
 
     let taskFormElement = displayForm ? <TaskForm onCloseForm={this.onCloseForm}
       onSubmit={this.onSubmit}
@@ -152,11 +190,11 @@ class App extends Component {
               <span className="fa fa-plus mr-5"></span>New Task
             </button>
             {/* Toolbar */}
-            <Toolbar />
+            <Toolbar onSearch={this.onSearch} onSort={this.onSort} />
             {/* TaskList */}
-            <TaskList tasks={tasks} 
-              onChangeStatus={this.onChangeStatus} 
-              onDelete={this.onDelete} 
+            <TaskList tasks={tasks}
+              onChangeStatus={this.onChangeStatus}
+              onDelete={this.onDelete}
               onEdit={this.onEdit}
               onFilter={this.onFilter} />
           </div>
