@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import TaskForm from './components/TaskForm';
 import Toolbar from './components/Toolbar';
 import TaskList from './components/TaskList';
+import test from './Temp/test';
 
 class App extends Component {
   constructor(props) {
